@@ -2,77 +2,59 @@ from loguru import logger as log
 import sys
 
 
-try:
-	checked_file = sys.argv[1]
-except IndexError:
-	log.debug("IndexError, maybe you didn't get file ---'python3 main.py yourFIle'")
+class FirstBracketIsClosed(Exception):
+    pass
 
 
-with open(checked_file, 'r') as file:
-    code = file.read()
-    lst = []
+class NotClosedBrackets(Exception):
+    pass
 
-    for letters in code:
-        lst.append(letters)
 
-    open_brackets = 0
-    syntaxis = []
-    for i in range(len(lst) -1):
-        if lst[i] == "(" or lst[i] == ")":
-            syntaxis.append(lst[i])
+@log.catch()
+def main() -> log:
+    try:
+        checked_file = sys.argv[1]
 
-    stek = 0
+    except IndexError:
+        log.debug("IndexError, maybe you didn't get file ---'python3 main.py yourFIle'")
 
-    for i in range(len(syntaxis)):
-        if syntaxis[i] == "(":
-            stek += 1
 
-        if syntaxis[i] != ")":
-            pass
+    with open(checked_file, 'r') as file:
+        code = file.read()
+        lst = []
+
+        for letters in code:
+            lst.append(letters)
+
+        syntaxis = []
+        for i in range(len(lst) -1):
+            if lst[i] == "(" or lst[i] == ")":
+                syntaxis.append(lst[i])
+
+        stek = 0
+
+        for i in range(len(syntaxis)):
+            if syntaxis[i] == "(":
+                stek += 1
+                isComplited = True
+
+            try:
+                if isComplited:
+                    if syntaxis[i] != ")":
+                        pass
+                    else:
+                        stek-=1
+
+            except UnboundLocalError:
+                pass
+#                raise FirstBracketIsClosed()
+
+
+        if stek != 0:
+            raise NotClosedBrackets()
         else:
-            stek-=1
+            log.success("")
 
 
-
-    if stek != 0:
-        log.error("Error detected!")
-    else:
-        log.success("Well done!")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        #if lst[i] == "(":
-         #   open_brackets += 1
-        #else:
-         #   pass
-
-    #print(open_brackets)
+if __name__ == '__main__':
+    main()
